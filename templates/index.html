@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .detector-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .detector-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 25px;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a56e8;
+        }
+        
+        .result-box {
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .real-news {
+            background-color: rgba(76, 201, 240, 0.2);
+            border-left: 5px solid var(--success-color);
+            color: #1e6f8c;
+        }
+        
+        .fake-news {
+            background-color: rgba(247, 37, 133, 0.2);
+            border-left: 5px solid var(--danger-color);
+            color: #a31645;
+        }
+        
+        .news-input {
+            min-height: 150px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 15px;
+        }
+        
+        .news-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-check-circle me-2"></i>FakeNewsDetector
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">API</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="container my-5">
+        <div class="hero-section p-5 text-center">
+            <h1 class="display-4 fw-bold mb-4">Fake News Detector</h1>
+            <p class="lead mb-4">AI-powered tool to identify misinformation and verify news authenticity</p>
+            <a href="#detector" class="btn btn-light btn-lg px-4">Try Now</a>
+        </div>
+    </section>
+
+    <!-- Detector Section -->
+    <section id="detector" class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="detector-card card p-4">
+                    <h2 class="text-center mb-4"><i class="fas fa-search me-2"></i>Check News Authenticity</h2>
+                    <form action="/predict" method="POST">
+                        <div class="mb-3">
+                            <textarea class="form-control news-input" id="news" name="news" placeholder="Paste news article or headline here..." required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-2"></i>Verify News
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% if prediction %}
+                    <div id="result" class="result-box {% if 'REAL' in prediction %}real-news{% else %}fake-news{% endif %}">
+                        <h4 class="mb-3"><i class="fas fa-{% if 'REAL' in prediction %}check-circle{% else %}times-circle{% endif %} me-2"></i>{{ prediction }}</h4>
+                        <p class="mb-0">
+                            {% if 'REAL' in prediction %}
+                            This content appears to be credible based on our analysis.
+                            {% else %}
+                            Warning: This content shows signs of being unreliable or false.
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="container my-5 py-5">
+        <h2 class="text-center mb-5">Why Use Our Detector?</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="text-center p-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4>Fast Analysis</h4>
+                    <p>Get instant results with our AI-powered detection system.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="text-center p-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Accurate Results</h4>
+                    <p>High precision model trained on thousands of verified samples.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="text-center p-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Secure & Private</h4>
+                    <p>Your data is processed securely and never stored.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 FakeNewsDetector. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Show result with animation if prediction exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultBox = document.getElementById('result');
+            if (resultBox) {
+                resultBox.style.display = 'block';
+                resultBox.style.animation = 'fadeIn 0.5s';
+            }
+        });
+    </script>
+</body>
+</html>
